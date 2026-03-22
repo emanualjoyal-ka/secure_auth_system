@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    /* File Layout - Essential for your 'build' and 'start' scripts */
+    "rootDir": "./src",                          // Tells TS where your source code lives
+    "outDir": "./dist",                         // Tells TS where to put compiled JavaScript
+
+    /* Environment Settings */
+    "module": "NodeNext",                        // Best for modern Node.js features
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",                          // Use modern JS syntax
+    "lib": ["ESNext"],                           // Includes modern JS library features
+    "types": ["node"],                           // Ensures @types/node is loaded
+
+    /* Interop - Important for bcrypt and commonjs modules */
+    "esModuleInterop": true,                     // Fixes "import bcrypt from 'bcrypt'" issues
+    "forceConsistentCasingInFileNames": true,
+
+    /* Other Outputs */
+    "sourceMap": true,                           // Helps with debugging
+    "declaration": true,
+    "declarationMap": true,
+
+    /* Stricter Typechecking Options */
+    "strict": true,                              // The "gold standard" for safety
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    /* Cleanliness */
+    "noUnusedLocals": true,                      // Keeps your code clean
+    "noUnusedParameters": true,
+    "skipLibCheck": true                         // Speeds up compilation
+  },
+  "include": ["src/**/*"],                       // Only compile files in src
+  "exclude": ["node_modules", "dist"]            // Don't look at these folders
+}
