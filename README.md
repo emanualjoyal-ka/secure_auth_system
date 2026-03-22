@@ -13,6 +13,7 @@ A robust and secure authentication system built with Node.js, Express, and TypeS
 - **Input Validation**: Joi-based validation for request data.
 - **MongoDB Integration**: User and session data stored in MongoDB using Mongoose.
 - **Environment Configuration**: Flexible configuration via environment variables.
+- **RBAC (Role-Based Access Control)**
 
 ## Tech Stack
 
@@ -141,21 +142,6 @@ The application uses environment variables for configuration. Key variables incl
 - `REFRESH_TOKEN_EXPIRE`: Refresh token expiration time (e.g., "7d")
 - `DB_URI`: MongoDB connection string
 
-## Screenshots
-
-_Add screenshots of the application here once available._
-
-## Future Improvements / Roadmap
-
-- [ ] Implement OAuth2 social login (Google, GitHub)
-- [ ] Add email verification for user registration
-- [ ] Implement password reset functionality
-- [ ] Add role-based access control (RBAC)
-- [ ] Integrate with Redis for session storage
-- [ ] Add API documentation with Swagger
-- [ ] Implement logging and monitoring
-- [ ] Add unit and integration tests
-
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
@@ -174,6 +160,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Author
 
-[Your Name] - [your.email@example.com]
-
-_Replace with your actual name and contact information._
+Emanual Joyal K A - emanualjoyalka@gmail.com
