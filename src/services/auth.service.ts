@@ -48,6 +48,61 @@ export const loginUser=async (email:string,password:string,userAgent:string,ip:s
 }
 
 
+//handelrefreshtoken
+export const handlerefreshtoken=async(token:string)=>{
+      //verify refresh token coming from client
+     const decoded=jwt.verify(token,process.env.REFRESH_TOKEN!) as {id:string};
+
+     //find all active sessions
+     const sessions=await sessionModel.find({userId:decoded.id,isValid:true});
+    
+     let validSession=null;
+
+     //compare hashed tokens
+     for(const session of sessions){
+        const isMatch=await bcrypt.compare(token,session.refreshToken);
+
+        if(isMatch){
+            validSession=session;
+            break;
+        }
+     }
+
+     //refreshtoken resue detection, If old token is reused → someone stole it
+     if(!validSession){
+        await sessionModel.updateMany({userId:decoded.id},{isValid:false});
+        throw new Error("Suspicious activity detected. Logged out from all devices")
+     }
+
+     if(validSession.expiresAt<new Date()){
+        validSession.isValid=false;
+        await validSession.save();
+
+        throw new Error("Sessionn expired");
+     }
+
+     const user=await userModel.findById(decoded.id);
+
+     if(!user){
+        throw new Error("User not found");
+     }
+
+     //Refresh token rotation : when /refresh is called after accesstoken expires, new refreshtoken is also generated and stored, thus increses security
+     //generate new refreshtoken
+     const newRefreshToken=generateRefreshToken(user._id.toString());
+
+     validSession.refreshToken=newRefreshToken;
+     validSession.expiresAt=new Date(Date.now()+7*24*60*60*1000);
+     await validSession.save();
+
+     //generate new accessToken
+     const newAccessToken=generateAccessToken(user._id.toString(),user.role);
+
+     return {newAccessToken, newRefreshToken};
+
+}
+
+
 //logout
 export const logoutUser=async (refreshToken:string)=>{
     const decoded=jwt.verify(refreshToken,process.env.REFRESH_TOKEN!) as {id:string};
@@ -74,3 +129,5 @@ export const logoutAllDevices=async(refreshToken:string)=>{
 
     await sessionModel.updateMany({userId:decoded.id},{isValid:false})
 }
+
+//logout from specific device

@@ -1,12 +1,7 @@
 import {Request, Response} from "express";
 import { registerValidation } from "../validations/auth.validation.js";
-import { createUser, loginUser, logoutAllDevices, logoutUser } from "../services/auth.service.js";
+import { createUser, handlerefreshtoken, loginUser, logoutAllDevices, logoutUser } from "../services/auth.service.js";
 import jwt from "jsonwebtoken";
-import { generateAccessToken, generateRefreshToken } from "../utils/generateToken.js";
-import userModel from "../models/user.model.js";
-import sessionModel from "../models/session.model.js";
-import bcrypt from "bcrypt";
-
 
 //register user
 export const registerUser=async(req:Request,res:Response)=>{
@@ -73,59 +68,14 @@ export const refreshTokenController=async(req:Request,res:Response)=>{
         return res.status(401).json({success:false,error:"No Refresh token"})
      }
 
-     //verify refresh token coming from client
-     const decoded=jwt.verify(token,process.env.REFRESH_TOKEN!) as {id:string};
-
-     //find all active sessions
-     const sessions=await sessionModel.find({userId:decoded.id,isValid:true});
-    
-     let validSession=null;
-
-     //compare hashed tokens
-     for(const session of sessions){
-        const isMatch=await bcrypt.compare(token,session.refreshToken);
-
-        if(isMatch){
-            validSession=session;
-            break;
-        }
-     }
-
-     if(!validSession){
-        return res.status(403).json({success:false,error:"Invalid session"});
-     }
-
-     if(validSession.expiresAt<new Date()){
-        validSession.isValid=false;
-        await validSession.save();
-
-        return res.status(403).json({success:false,error:"Sessionn expired"});
-     }
-
-     const user=await userModel.findById(decoded.id);
-
-     if(!user){
-        return res.status(404).json({success:false,error:"User not found"});
-     }
-
-     //Refresh token rotation : when /refresh is called after accesstoken expires, new refreshtoken is also generated and stored, thus increses security
-     //generate new refreshtoken
-     const newRefreshToken=generateRefreshToken(user._id.toString());
-
-     validSession.refreshToken=newRefreshToken;
-     validSession.expiresAt=new Date(Date.now()+7*24*60*60*1000);
-     await validSession.save();
-
+     const {newAccessToken, newRefreshToken}=await handlerefreshtoken(token);
+   
      res.cookie("refreshToken",newRefreshToken,{
         httpOnly:true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000
      })
-
-
-     //generate new accessToken
-     const newAccessToken=generateAccessToken(user._id.toString(),user.role);
 
      res.cookie("accessToken",newAccessToken,{
         httpOnly:true,
