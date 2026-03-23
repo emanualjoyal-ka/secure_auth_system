@@ -6,7 +6,7 @@ import { createUser } from "../controllers/admin.controller.js";
 
 const router=Router();
 
-router.post("/create-user",authenticate,authorize("admin"),createUser);
+router.post("/create-user",authenticate,authorize("admin"),createUser); //only admin can create user
 
 
 export default router;

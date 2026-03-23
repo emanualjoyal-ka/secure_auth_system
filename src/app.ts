@@ -3,6 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import sessionRoutes from "./routes/session.routes.js";
+import csrfRoutes from "./routes/csrf.routes.js";
 import helmet from "helmet";
 import { createLimiter } from "./middleware/rateLimit.middleware.js";
 
@@ -17,5 +19,7 @@ app.use(apiLimiter); // limits requests
 
 app.use("/api/auth",authRoutes);
 app.use("/api/admin",adminRoutes);
+app.use("/api",csrfRoutes);
+app.use("/api/session",sessionRoutes);
 
 export default app;

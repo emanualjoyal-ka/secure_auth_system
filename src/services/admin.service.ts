@@ -1,6 +1,6 @@
 import userModel from "../models/user.model.js"
 
-
+//user creation, admin can only create user and assign role
 export const createUserByAdmin=async(name:string,email:string,password:string,role:"user" | "admin")=>{
     const existingUser=await userModel.findOne({email});
 
