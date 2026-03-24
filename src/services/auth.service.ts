@@ -131,3 +131,19 @@ export const logoutAllDevices=async(refreshToken:string)=>{
 }
 
 //logout from specific device
+export const logoutSession=async (userId:string,sessionId:string)=>{
+    const session=await sessionModel.findById(sessionId);
+
+    if(!session){
+        throw new Error("Session not found");
+    }
+
+    if(session.userId.toString() !== userId){
+        throw new Error("Unauthorized")
+    }
+
+    session.isValid=false;
+    await session.save();
+
+    return session;
+}
