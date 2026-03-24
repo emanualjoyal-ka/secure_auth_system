@@ -1,7 +1,8 @@
 import {Request, Response} from "express";
 import { registerValidation } from "../validations/auth.validation.js";
-import { createUser, handlerefreshtoken, loginUser, logoutAllDevices, logoutUser } from "../services/auth.service.js";
+import { createUser, handlerefreshtoken, loginUser, logoutAllDevices, logoutSession, logoutUser } from "../services/auth.service.js";
 import jwt from "jsonwebtoken";
+import { AuthRequest } from "../middleware/auth.middleware.js";
 
 //register user
 export const registerUser=async(req:Request,res:Response)=>{
@@ -131,5 +132,24 @@ export const allDeviceLogout=async(req:Request,res:Response)=>{
         res.json({success:true,message:"Successfully logged out from all devices"})
     } catch (error) {
         res.status(500).json({success:false,error:"SERVER ERROR"})
+    }
+}
+
+
+//logout specific device
+export const logoutDevice=async (req:AuthRequest,res:Response)=>{
+    try {
+        const {sessionId}=req.body;
+        const userId=req.user.id;
+
+        if(!sessionId){
+            return res.status(400).json({success:false,error:"SessionId is required"})
+        }
+
+        await logoutSession(userId,sessionId);
+
+        res.json({success:true})
+    } catch (error:unknown) {
+        res.status(500).json({success:false,error:"SERVER ERROR"});
     }
 }
