@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Response,Request}  from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.routes.js";
@@ -21,5 +21,8 @@ app.use("/api/auth",authRoutes);
 app.use("/api/admin",adminRoutes);
 app.use("/api",csrfRoutes);
 app.use("/api/session",sessionRoutes);
+app.get('/api/health', (_req:Request, res:Response) => {    //for avoiding cold start since i am deployed in free tier render
+  res.json({ status: 'ok' });       //using uptimerobot which sends GET request every 5 minutes
+});
 
 export default app;
