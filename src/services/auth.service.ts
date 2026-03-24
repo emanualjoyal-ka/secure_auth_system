@@ -30,8 +30,18 @@ export const loginUser=async (email:string,password:string,userAgent:string,ip:s
 
     const isMatch=await user.comparePassword(password);
     if(!isMatch){
+        user.loginAttempts += 1;   // increse logon attempt when login fails
+        if(user.loginAttempts >=5){ // if 5 or more attempts
+            user.lockUntil=new Date(Date.now() + 24 * 60 * 60 * 1000) //account blocked for 24 hours
+            throw new Error("You have been locked out, try agein later");
+        }
+        await user.save();
         throw new Error("Invalid password")
     }
+
+    user.loginAttempts=0;  //resets attempts if login successfull
+    user.lockUntil=undefined;
+    await user.save();
 
     const accessToken=generateAccessToken(user._id.toString(),user.role);
     const refreshToken=generateRefreshToken(user._id.toString());

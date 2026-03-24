@@ -27,6 +27,13 @@ const userSchema=new mongoose.Schema<IUser>({
         type:String,
         enum:["user","admin"],
         default:"user"
+    },
+    loginAttempts:{
+        type:Number,
+        default:0
+    },
+    lockUntil:{
+        type:Date
     }
 },
 {
