@@ -33,9 +33,11 @@ export const loginUser=async (email:string,password:string,userAgent:string,ip:s
         user.loginAttempts += 1;   // increse logon attempt when login fails
         if(user.loginAttempts >=5){ // if 5 or more attempts
             user.lockUntil=new Date(Date.now() + 24 * 60 * 60 * 1000) //account blocked for 24 hours
-            throw new Error("You have been locked out, try agein later");
         }
         await user.save();
+        if(user.lockUntil && user.lockUntil > new Date()){
+            throw new Error ("Account is locked. Try again later")
+        }
         throw new Error("Invalid password")
     }
 
@@ -156,4 +158,33 @@ export const logoutSession=async (userId:string,sessionId:string)=>{
     await session.save();
 
     return session;
+}
+
+
+//change password only after login
+export const changeUserPassword=async(userId:string,currentPassword:string,newPassword:string)=>{
+    const user=await userModel.findById(userId).select("+password");
+
+    if(!user){
+        throw new Error("User not found");
+    }
+
+    const isMatch=await user.comparePassword(currentPassword);
+
+    //checks current password
+    if(!isMatch){
+        throw new Error("Current password is incorrect")
+    }
+
+    //checks if current and new passwords are same
+    const isSame=await user.comparePassword(newPassword);
+    if(isSame){
+        throw new Error("New password cannot be same as previous password");
+    }
+
+    user.password=newPassword; //assigning new password
+    await user.save();
+
+    //invalidate all sessions
+    await sessionModel.updateMany({userId:userId},{isValid:false})
 }

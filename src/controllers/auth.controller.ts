@@ -1,8 +1,9 @@
 import {Request, Response} from "express";
 import { registerValidation } from "../validations/auth.validation.js";
-import { createUser, handlerefreshtoken, loginUser, logoutAllDevices, logoutSession, logoutUser } from "../services/auth.service.js";
+import { changeUserPassword, createUser, handlerefreshtoken, loginUser, logoutAllDevices, logoutSession, logoutUser } from "../services/auth.service.js";
 import jwt from "jsonwebtoken";
 import { AuthRequest } from "../middleware/auth.middleware.js";
+import { changePasswordValidation } from "../validations/changePassword.validation.js";
 
 //register user
 export const registerUser=async(req:Request,res:Response)=>{
@@ -150,6 +151,38 @@ export const logoutDevice=async (req:AuthRequest,res:Response)=>{
 
         res.json({success:true})
     } catch (error:unknown) {
+        res.status(500).json({success:false,error:"SERVER ERROR"});
+    }
+}
+
+//change password after login
+export const changePassword=async (req:AuthRequest,res:Response)=>{
+    try {
+        const userId=req.user.id;
+
+        const {error}=changePasswordValidation.validate(req.body); //Joi validation
+
+        if(error){
+            return res.status(400).json({success:false,error:error.details[0]?.message});
+        }
+
+        const {currentPassword,newPassword}=req.body;
+        if(!currentPassword || !newPassword){
+            return res.status(400).json({success:false,error:"All fields are required"})
+        }
+
+        await changeUserPassword(userId,currentPassword,newPassword);
+
+        //clear cookies, force login
+        res.clearCookie("accessToken");
+        res.clearCookie("refreshToken");
+
+        res.json({success:true,message:"Password Changed,please login again"});
+    } catch (error:unknown) {
+        if(error instanceof Error){
+            return res.status(400).json({success:false,error:error.message})
+        }
+
         res.status(500).json({success:false,error:"SERVER ERROR"});
     }
 }
