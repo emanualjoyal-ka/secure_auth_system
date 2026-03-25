@@ -1,10 +1,10 @@
-# 🔐 Secure Auth System
+# Secure Auth System
 
-## 🚀 Project Overview
+## Project Overview
 
 **Secure Auth System** is a comprehensive, enterprise-grade backend authentication API built with modern technologies. This project showcases advanced skills in secure software development, demonstrating expertise in implementing robust authentication mechanisms, API security, database design, and scalable backend architecture.
 
-### 🎯 What This Project Demonstrates
+### What This Project Demonstrates
 - **User Registration & Login**: Secure user signup and authentication with password hashing using bcrypt.
 - **JWT Token Management**: Access and refresh tokens for stateless authentication.
 - **Session Management**: Track user sessions with device-specific logout capabilities.
@@ -24,20 +24,20 @@ This authentication system is designed to handle real-world security requirement
 - **Type Safety**: Full TypeScript implementation ensuring runtime reliability
 - **API Best Practices**: RESTful design with proper HTTP status codes and error handling
 
-### ✨ Key Features
+### Key Features
 
-- 🔑 **JWT Authentication**: Stateless token-based auth with access/refresh token rotation
-- 🛡️ **Password Security**: Bcrypt hashing (12 salt rounds) preventing rainbow table attacks
-- 🚫 **Account Protection**: Automatic lockout after 5 failed login attempts (24-hour duration)
-- 📊 **Session Management**: Device-specific session tracking with logout capabilities
-- ⚡ **Rate Limiting**: Configurable request limits preventing brute force and DoS attacks
-- ✅ **Input Validation**: Joi schema validation for all user inputs
-- 🔒 **Security Headers**: Helmet.js integration for XSS protection and secure headers
-- 🌐 **CORS Support**: Configurable cross-origin resource sharing
-- 👥 **Role-Based Access Control**: User/Admin roles with authorization middleware
-- 📱 **HTTP-Only Cookies**: Secure token storage preventing XSS theft
+- **JWT Authentication**: Stateless token-based auth with access/refresh token rotation
+- **Password Security**: Bcrypt hashing (12 salt rounds) preventing rainbow table attacks
+- **Account Protection**: Automatic lockout after 5 failed login attempts (24-hour duration)
+- **Session Management**: Device-specific session tracking with logout capabilities
+- **Rate Limiting**: Configurable request limits preventing brute force and DoS attacks
+- **Input Validation**: Joi schema validation for all user inputs
+- **Security Headers**: Helmet.js integration for XSS protection and secure headers
+- **CORS Support**: Configurable cross-origin resource sharing
+- **Role-Based Access Control**: User/Admin roles with authorization middleware
+- **HTTP-Only Cookies**: Secure token storage preventing XSS theft
 
-## 🛠 Tech Stack & Technologies Used
+## Tech Stack & Technologies Used
 
 ### Core Technologies
 
@@ -72,7 +72,7 @@ This authentication system is designed to handle real-world security requirement
 - **Development Server**: tsx - TypeScript execution and hot reloading
 - **Package Manager**: npm - Node package management
 
-## 📋 Prerequisites & System Requirements
+## Prerequisites & System Requirements
 
 Before running this project, ensure you have:
 
@@ -81,7 +81,7 @@ Before running this project, ensure you have:
 - **npm**: Node package manager (comes with Node.js)
 - **Git**: For cloning the repository
 
-## 🚀 Setup & Installation Guide
+## Setup & Installation Guide
 
 ### Step 1: Clone the Repository
 
@@ -118,7 +118,7 @@ REFRESH_TOKEN_EXPIRE=7d
 CLIENT_URL=http://localhost:3000
 ```
 
-**🔐 Security Best Practices for Environment Variables:**
+**Security Best Practices for Environment Variables:**
 
 - Use strong, unique secrets (minimum 32 characters)
 - Never commit `.env` files to version control
@@ -142,7 +142,7 @@ mongod
 # Or use MongoDB Atlas and update MONGO_URI accordingly
 ```
 
-## 🎮 Usage & Running the Application
+## Usage & Running the Application
 
 ### Development Mode (Recommended)
 
@@ -172,11 +172,11 @@ When successfully started, you'll see:
 ✅ SERVER is running on http://localhost:3000
 ```
 
-## 📚 Complete API Documentation
+## Complete API Documentation
 
 The API follows RESTful conventions with JSON request/response format. All endpoints are prefixed with `/api`.
 
-### 🔐 Authentication Endpoints
+### Authentication Endpoints
 
 #### 1. User Registration
 
@@ -382,7 +382,7 @@ Cookie: accessToken=<access_token>; refreshToken=<refresh_token>
 }
 ```
 
-### 👑 Admin Endpoints
+### Admin Endpoints
 
 #### 6. Admin Create User
 
@@ -426,7 +426,7 @@ Content-Type: application/json
 }
 ```
 
-## 🧪 Complete API Testing Guide
+## Complete API Testing Guide
 
 ### Method 1: Testing with Postman
 
@@ -564,7 +564,7 @@ curl -X POST http://localhost:3000/api/admin/create-user \
 4. Use environment variables for tokens
 5. Test authentication flow step by step
 
-## 🔒 Security Features Implemented
+## Security Features Implemented
 
 ### Authentication & Authorization
 
@@ -588,7 +588,7 @@ curl -X POST http://localhost:3000/api/admin/create-user \
 - **Environment Security**: Sensitive data in environment variables
 - **Error Handling**: No sensitive information leaked in error responses
 
-## 📁 Project Structure & Architecture
+## Project Structure & Architecture
 
 ```
 src/
@@ -636,7 +636,7 @@ src/
 - **Type Safety**: Full TypeScript coverage with interfaces
 - **Scalable Structure**: Easy to add new features and endpoints
 
-## 🤝 Contributing Guidelines
+## Contributing Guidelines
 
 We welcome contributions! This project follows industry best practices.
 
@@ -658,7 +658,7 @@ We welcome contributions! This project follows industry best practices.
 - Write unit tests for new features
 - Maintain security best practices
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
@@ -684,7 +684,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - **Problem Solving**: Complex authentication logic and edge cases
 - **Best Practices**: Following Node.js and TypeScript conventions
 
-## 🧠 What I Learned
+## What I Learned
 
 - How to design and implement robust authentication workflows using JWT (access and refresh tokens) with secure cookie handling.
 - Applying security-first design using bcrypt hashing, rate limiting, account lockout, and helmet security headers.
@@ -695,6 +695,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-_Built with ❤️ using modern web technologies and security best practices._
+_Built with using modern web technologies and security best practices._
 
 Emanual Joyal K A - emanualjoyalka@gmail.com
