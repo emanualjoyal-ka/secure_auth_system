@@ -86,7 +86,7 @@ Before running this project, ensure you have:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/secure-auth-system.git
+git clone https://github.com/emanualjoyal-ka/secure_auth_system.git
 cd secure-auth-system
 ```
 
