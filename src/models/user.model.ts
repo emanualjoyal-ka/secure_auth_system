@@ -34,6 +34,9 @@ const userSchema=new mongoose.Schema<IUser>({
     },
     lockUntil:{
         type:Date
+    },
+    passwordChangedAt:{
+        type:Date
     }
 },
 {
@@ -43,7 +46,8 @@ const userSchema=new mongoose.Schema<IUser>({
 //password hash
 userSchema.pre<IUser>("save",async function (){
     if(!this.isModified("password")) return; //prevents rehashing an already hashed password
-    this.password=await bcrypt.hash(this.password,10); 
+    this.password=await bcrypt.hash(this.password,12);  //hashing password
+    this.passwordChangedAt=new Date(); //password change date
 });
 
 //custom method 'comparePassword' for password comparing

@@ -40,5 +40,6 @@ sessionSchema.pre<ISession>("save",async function(){ //hashing requestToken inca
 })
 
 sessionSchema.index({expiresAt:1},{expireAfterSeconds:0}) //auto deletes expired sessions
+sessionSchema.index({ userId: 1, isValid: 1 }); //avoids scanning entire documents
 
 export default mongoose.model<ISession>("Session",sessionSchema);
