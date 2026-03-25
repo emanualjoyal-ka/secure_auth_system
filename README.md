@@ -5,6 +5,16 @@
 **Secure Auth System** is a comprehensive, enterprise-grade backend authentication API built with modern technologies. This project showcases advanced skills in secure software development, demonstrating expertise in implementing robust authentication mechanisms, API security, database design, and scalable backend architecture.
 
 ### 🎯 What This Project Demonstrates
+- **User Registration & Login**: Secure user signup and authentication with password hashing using bcrypt.
+- **JWT Token Management**: Access and refresh tokens for stateless authentication.
+- **Session Management**: Track user sessions with device-specific logout capabilities.
+- **Rate Limiting**: Prevents abuse with configurable request limits on sensitive endpoints.
+- **Security Headers**: Helmet integration for XSS protection and secure HTTP headers.
+- **CORS Support**: Configurable cross-origin resource sharing for frontend integration.
+- **Input Validation**: Joi-based validation for request data.
+- **MongoDB Integration**: User and session data stored in MongoDB using Mongoose.
+- **Environment Configuration**: Flexible configuration via environment variables.
+- **RBAC (Role-Based Access Control)**
 
 This authentication system is designed to handle real-world security requirements, featuring:
 
@@ -686,3 +696,5 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ---
 
 _Built with ❤️ using modern web technologies and security best practices._
+
+Emanual Joyal K A - emanualjoyalka@gmail.com
