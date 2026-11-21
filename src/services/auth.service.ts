@@ -3,56 +3,60 @@ import userModel from "../models/user.model.js"
 import { generateAccessToken, generateRefreshToken } from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { userRequestDto } from "../dtos/auth.dto/userRequestDto.js";
+import { userResponseDto } from "../dtos/auth.dto/userResponseDto.js";
+import { authRepository } from "../repository/auth.repository.js";
+import ApiError from "../utils/ApiError.js";
+import { userLoginRequest } from "../dtos/auth.dto/loginDto.js";
 
-//creating user
-export const createUser=async (name:string,email:string,password:string)=>{
-    const userExists=await userModel.findOne({email});
 
-    if(userExists){
-        throw new Error("User already exists")
-    }
-
-    const user=await userModel.create({
-        name:name,
-        email:email,
-        password:password
-    });
-
-    return user;
+export const createUser=async (user:userRequestDto):Promise<userResponseDto>=>{
+    const userExists=await authRepository.getUser(user.email)
+    if(userExists) throw new ApiError("User already exists",409)
+    const hashedPasswd=await bcrypt.hash(user.password,10);
+    const userData:userRequestDto = {
+        name: user.name,
+        email: user.email,
+        password: hashedPasswd,
+    };
+    const res=await authRepository.createUser(userData)
+    return {
+        id:res._id.toString(),
+        name:res.name,
+        email:res.email,
+        role:res.role
+    };
 }
 
-//user login
-export const loginUser=async (email:string,password:string,userAgent:string,ip:string)=>{
-    const user=await userModel.findOne({email}).select("+password");
-    if(!user){
-        throw new Error("User not found");
-    }
 
-    const isMatch=await user.comparePassword(password);
+export const loginUser=async (user:userLoginRequest)=>{
+    const userExist=await authRepository.getUser(user.email)
+    if(!userExist) throw new ApiError("Invalid email or password",404);
+    const isMatch=await bcrypt.compare(user.password,userExist.password)
     if(!isMatch){
-        user.loginAttempts += 1;   // increse logon attempt when login fails
-        if(user.loginAttempts >=5){ // if 5 or more attempts
-            user.lockUntil=new Date(Date.now() + 24 * 60 * 60 * 1000) //account blocked for 24 hours
+        userExist.loginAttempts += 1;   // increse login attempt when login fails
+        if(userExist.loginAttempts >=5){ // if 5 or more attempts
+            userExist.lockUntil=new Date(Date.now() + 24 * 60 * 60 * 1000) //account blocked for 24 hours
         }
-        await user.save();
-        if(user.lockUntil && user.lockUntil > new Date()){
+        await userExist.save();
+        if(userExist.lockUntil && userExist.lockUntil > new Date()){
             throw new Error ("Account is locked. Try again later")
         }
         throw new Error("Invalid password")
     }
 
-    user.loginAttempts=0;  //resets attempts if login successfull
-    user.lockUntil=undefined;
-    await user.save();
+    userExist.loginAttempts=0;  //resets attempts if login successfull
+    userExist.lockUntil=undefined;
+    await userExist.save();
 
-    const accessToken=generateAccessToken(user._id.toString(),user.role);
-    const refreshToken=generateRefreshToken(user._id.toString());
+    const accessToken=generateAccessToken(userExist._id.toString(),userExist.role);
+    const refreshToken=generateRefreshToken(userExist._id.toString());
 
     await sessionModel.create({
-        userId:user._id,
+        userId:userExist._id,
         refreshToken:refreshToken,
-        userAgent:userAgent,
-        ip:ip,
+        userAgent:user.userAgent,
+        ip:user.ip,
         expiresAt:new Date(Date.now()+7*24*60*60*1000)
     })
 
@@ -169,7 +173,7 @@ export const changeUserPassword=async(userId:string,currentPassword:string,newPa
         throw new Error("User not found");
     }
 
-    const isMatch=await user.comparePassword(currentPassword);
+    const isMatch=await bcrypt.compare(user.password,currentPassword);
 
     //checks current password
     if(!isMatch){
@@ -177,7 +181,7 @@ export const changeUserPassword=async(userId:string,currentPassword:string,newPa
     }
 
     //checks if current and new passwords are same
-    const isSame=await user.comparePassword(newPassword);
+    const isSame=await bcrypt.compare(user.password,newPassword)
     if(isSame){
         throw new Error("New password cannot be same as previous password");
     }

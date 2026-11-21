@@ -1,41 +1,28 @@
 import {Request, Response} from "express";
-import { registerValidation } from "../validations/auth.validation.js";
 import { changeUserPassword, createUser, handlerefreshtoken, loginUser, logoutAllDevices, logoutSession, logoutUser } from "../services/auth.service.js";
 import jwt from "jsonwebtoken";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import { changePasswordValidation } from "../validations/changePassword.validation.js";
+import { sendResponse } from "../utils/ApiResponse.js";
 
-//register user
+
 export const registerUser=async(req:Request,res:Response)=>{
-    try {
-        const {error}=registerValidation.validate(req.body);
-        if(error){
-            return res.status(400).json({message:error.details[0]?.message});
-        }
-
-        const {name, email, password}=req.body;
-        const user=await createUser(name,email,password);
-
-        res.status(201).json({success:true,data:user});
-
-    } catch (error) {
-        if(error instanceof Error){
-            return res.status(400).json({success:false,error:error.message});
-        }
-        res.status(500).json({success:false,error:"SERVER ERROR"});
-    }
+        const user=await createUser(req.body);
+        return sendResponse(res,{
+            statusCode:201,
+            message:"User created successfully",
+            data:user
+        })
 }
 
-
-//user login
 export const userLogin=async (req:Request,res:Response)=>{
-    try {
-        const {email, password}=req.body;
-
-        const userAgent=req.get("User-Agent") || "";
-        const ip=req.ip || "0.0.0.0";
-
-        const {user,accessToken,refreshToken}=await loginUser(email,password,userAgent,ip);
+        const input={
+            email:req.body.email,
+            password:req.body.password,
+            userAgent:req.get("User-Agent") || "",
+            ip:req.ip || "0.0.0.0"
+        }
+        const {user,accessToken,refreshToken}=await loginUser(input);
 
         res.cookie("accessToken",accessToken,{
             httpOnly:true,  //cannot access from java script
@@ -52,13 +39,6 @@ export const userLogin=async (req:Request,res:Response)=>{
         })
 
         res.status(200).json({success:true,data:user,message:"Logged in successfully"})
-
-    } catch (error:unknown) {
-        if(error instanceof Error){
-            return res.status(400).json({success:false,error:error.message});
-        }
-        res.status(500).json({success:false,error:"SERVER ERROR"})
-    }
 }
 
 
