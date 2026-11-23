@@ -3,7 +3,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
-import sessionRoutes from "./routes/session.routes.js";
 import helmet from "helmet";
 import { createLimiter } from "./middleware/rateLimit.middleware.js";
 import errorHandler from "./middleware/error.middleware.js";
@@ -21,7 +20,6 @@ app.use(apiLimiter); // limits all requests
 
 app.use("/api/auth",authRoutes);
 app.use("/api/admin",adminRoutes);
-app.use("/api/session",sessionRoutes);
 app.get('/api/health', (_req:Request, res:Response) => {    //for avoiding cold start since deployed in free tier in render
   res.json({ status: 'ok' });       //using uptimerobot which sends GET request every 5 minutes
 });

@@ -210,6 +210,7 @@ export const changeUserPassword=async(userId:string|undefined,currentPassword:st
     if(isSame) throw new ApiError("New password cannot be same as previous password",400);
     const hashedPasswd = await bcrypt.hash(newPassword, 10);
     user.password=hashedPasswd;
+    user.passwordChangedAt=new Date();
     await user.save();
     //invalidate all sessions
     await sessionModel.updateMany({userId:user._id,isRevoked:false},{$set:{isRevoked:true}})
