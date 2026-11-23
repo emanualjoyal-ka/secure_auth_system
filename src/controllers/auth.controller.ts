@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import { changeUserPassword, createUser, currentUser, handlerefreshtoken, loginUser, logoutAllDevices, logoutSession, logoutUser } from "../services/auth.service.js";
+import { changeUserPassword, createUser, currentUser, getAllSessions, handlerefreshtoken, loginUser, logoutAllDevices, logoutSession, logoutUser } from "../services/auth.service.js";
 import { sendResponse } from "../utils/ApiResponse.js";
 import { accessCookieOptions, refreshCookieOptions } from "../utils/cookie.js";
 
@@ -78,13 +78,25 @@ export const allDeviceLogout=async(req:Request,res:Response)=>{
 
 //logout specific device
 export const logoutDevice=async (req:Request,res:Response)=>{
-        const {sessionId}=req.body;
+        const {sessionId}=req.params;
         const userId=req.user?.userId;
         await logoutSession(userId,sessionId);
         return sendResponse(res,{
             statusCode:200,
             message:"Logged out from device successfully"
         })
+}
+
+// get all sessions of authenticated user
+export const getSessions=async(req:Request,res:Response)=>{
+    const userId=req.user!.userId;
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.max(1, Number(req.query.limit) || 5);
+    const data=await getAllSessions(userId,page,limit);
+    return sendResponse(res,{
+        statusCode:200,
+        data
+    })
 }
 
 //change password after login

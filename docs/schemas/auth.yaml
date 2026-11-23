@@ -32,3 +32,23 @@ LoginRequest:
       format: password
       example: StrongPassword123!
 
+ChangePassword:
+  type: object
+  required:
+    - currentPassword
+    - newPassword
+    - confirmPassword
+  properties:
+    currentPassword:
+      type: string
+      forma: password
+      example: StrongPassword123!
+    newPassword:
+      type: string
+      format: password
+      example: NewStrongPassword123!
+    confirmPassword:
+      type: string
+      format: password
+      example: NewStrongPassword123!
+

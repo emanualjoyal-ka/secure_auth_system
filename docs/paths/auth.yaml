@@ -53,7 +53,7 @@ login:
 logout:
   post:
     summary: logout
-    description: logging out revokes all sessions
+    description: logging out and revoke session
     tags :
       - Authentication
     responses:
@@ -61,3 +61,195 @@ logout:
         description: logged out successfully
       "401":
         description: Access token missing or invalid
+
+refresh:
+  post:
+    summary: renew access token (should be logged in)
+    description: >
+      Renews the access token when the current access token expires. 
+      Implements refresh token rotation for enhanced security. 
+      The refresh token is automatically sent by the browser through an HTTP-only cookie.
+    tags:
+      - Authentication
+    responses:
+      "200":
+        description: Access token and refresh token renewed successfully
+      "401":
+        description: Unauthorized, Missing, invalid, expired, or reused refresh token, or expired session.
+      "404":
+        description: User not found
+      "500":
+        description: Internal server error
+
+logout-all-devices:
+  post: 
+    summary: logs out from all devices (login multiple times for creating multiple sessions)
+    description: >
+      Logs out the user from all devices by revoking all active sessions.
+      The user must log in again using /api/auth/login.
+    tags:
+      - Authentication
+    responses:
+      "200":
+        description: Successfully logged out from all devices. All active sessions have been revoked.
+      "400":
+        description: Refresh token not provided.
+      "401":
+        description: Invalid, expired, or malformed refresh token.
+      "500":
+        description: Internal server error.
+
+logout-from-device:
+  post: 
+    summary: log out from specific device
+    description: >
+      Logs out the authenticated user from a specific device by revoking
+      its associated session. The sessionId must be obtained from the
+      id field returned by the Get All Sessions API
+      (GET /api/auth/get-sessions).
+    tags:
+      - Authentication
+    security:
+      - accessCookie: []
+    parameters:
+      - in: path
+        name: sessionId
+        required: true
+        schema:
+          type: string
+        description: > 
+          Session ID to revoke.Obtain this value from the
+          id field in the Get All Sessions API response.
+    responses:
+      "200":
+        description: Successfully logged out from the specified device. Session revoked.
+      "400":
+        description: Session ID is required.
+      "401":
+        description: Unauthorized. User authentication is required.
+      "404":
+        description: Session not found or already revoked.
+      "500":
+        description: Internal server error.
+
+profile:
+  get:
+    summary: Get logged-in user profile
+    tags:
+      - Authentication
+    security:
+      - accessCookie: []
+    responses:
+      "200":
+        description: Profile retrieved successfully
+      "401":
+        description: Access token missing or invalid
+
+getSessions:
+  get:
+    summary: Get authenticated user's sessions
+    description: Get all active sessions of the authenticated user with pagination.
+    tags:
+      - Authentication
+    security:
+      - accessCookie: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+        description: Page number
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 5
+        description: Number of sessions per page
+    responses:
+      "200":
+        description: Sessions retrieved successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 200
+                data:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: "674a8f1234567890abcdef12"
+                          createdAt:
+                            type: string
+                            format: date-time
+                            example: "2026-11-20T10:30:00.000Z"
+                          expiresAt:
+                            type: string
+                            format: date-time
+                            example: "2026-12-20T10:30:00.000Z"
+                    pagination:
+                      type: object
+                      properties:
+                        page:
+                          type: integer
+                          example: 1
+                        limit:
+                          type: integer
+                          example: 5
+                        totalItems:
+                          type: integer
+                          example: 12
+                        totalPages:
+                          type: integer
+                          example: 3
+                        hasNextPage:
+                          type: boolean
+                          example: true
+                        hasPreviousPage:
+                          type: boolean
+                          example: false
+      "401":
+        description: Unauthorized - Invalid or missing access token
+      "500":
+        description: Internal server error
+
+
+
+
+change-password:
+  post:
+    summary: Change password
+    description: >
+      Changes the authenticated user's password.
+      The new password must not be the same as the previous password.
+      All active sessions will be revoked after a successful password change, requiring the user to log in again.
+    tags: 
+      - Authentication
+    security:
+      - accessCookie: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/auth.yaml#/ChangePassword"
+    responses:
+      "200":
+        description: Password changed successfully. All active sessions have been revoked.
+      "400":
+        description: Current password is incorrect or new password is the same as the previous password.
+      "401":
+        description: Unauthorized. User authentication is required.
+      "404":
+        description: User not found.
+      "500":
+        description: Internal server error.
