@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import { userRegisterRequest, userRegisterResponse } from "../dtos/auth.dto/registerDto.js";
 import { getUserResponse } from "../dtos/user.dto/getUserDto.js";
 import { renewAccessTokenResponse } from "../dtos/auth.dto/refreshTokenDto.js";
+import { AllSessionsDtoResponse } from "../dtos/auth.dto/sessionResponseDto.js";
 
 
 export const createUser=async (user:userRegisterRequest):Promise<userRegisterResponse>=>{
@@ -132,11 +133,6 @@ export const logoutUser=async (refreshToken:string):Promise<void>=>{
     const sessions=await sessionModel.find({userId:decoded.userId,token_id: decoded.token_id,isRevoked:false});
     for(const session of sessions){
         const isMatch=await bcrypt.compare(refreshToken,session.refreshToken);
-         console.log({
-            sessionId: session._id,
-            tokenId: session.token_id,
-            isMatch
-        });
         if(isMatch){
             session.isRevoked=true;
             await session.save();
@@ -155,13 +151,50 @@ export const logoutAllDevices=async(refreshToken:string):Promise<void>=>{
 }
 
 //logout from specific device
-export const logoutSession=async (userId:string|undefined,sessionId:string):Promise<void>=>{
+export const logoutSession=async (userId:string|undefined,sessionId:unknown):Promise<void>=>{
     if (!userId) throw new ApiError("Unauthorized", 401);
-    if (!sessionId) throw new ApiError("SessionId is required", 400);
+    if (typeof sessionId !== "string" || !sessionId.trim()) throw new ApiError("SessionId is required", 400);
     const session = await sessionModel.findOne({_id: sessionId,userId,isRevoked: false});
     if(!session) throw new ApiError("Session not found",404);
     session.isRevoked=true;
     await session.save();
+}
+
+export const getAllSessions=async(userId:string,page:number,limit:number):Promise<AllSessionsDtoResponse>=>{
+    if (!userId) throw new ApiError("Unauthorized", 401);
+    const skip = (page - 1) * limit;
+    const filter = {
+        userId,
+        isRevoked: false,
+        expiresAt: { $gt: new Date() }
+    };
+    const [sessions, totalItems] = await Promise.all([
+        sessionModel
+            .find(filter)
+            .select("_id createdAt expiresAt")
+            .sort({ updatedAt: -1 })
+            .skip(skip)
+            .limit(limit),
+
+        sessionModel.countDocuments(filter)
+    ]);
+    const totalPages = Math.ceil(totalItems / limit); 
+    return {
+        data:sessions.map(session => ({
+            id: session._id.toString(),
+            userAgent:session.userAgent!,
+            createdAt: session.createdAt!,
+            expiresAt: session.expiresAt
+        })),
+        pagination:{
+            page,
+            limit,
+            totalItems,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPreviousPage: page > 1
+        }
+    };
 }
 
 

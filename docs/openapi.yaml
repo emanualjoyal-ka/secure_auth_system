@@ -17,9 +17,19 @@ paths:
   /api/auth/login:
     $ref: "./paths/auth.yaml#/login"
   /api/auth/me:
-    $ref: "./paths/user.yaml#/profile"
+    $ref: "./paths/auth.yaml#/profile"
+  /api/auth/change-password:
+    $ref: "./paths/auth.yaml#/change-password"
+  /api/auth/get-sessions:
+    $ref: "./paths/auth.yaml#/getSessions"
+  /api/auth/refresh:
+    $ref: "./paths/auth.yaml#/refresh"
   /api/auth/logout:
     $ref: "./paths/auth.yaml#/logout"
+  /api/auth/logout-device/{sessionId}:
+    $ref: "./paths/auth.yaml#/logout-from-device"
+  /api/auth/logout-all-devices:
+    $ref: "./paths/auth.yaml#/logout-all-devices"
 
 components:
   securitySchemes:
