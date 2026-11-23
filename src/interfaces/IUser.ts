@@ -9,5 +9,4 @@ export interface IUser extends Document{
     loginAttempts:number;
     lockUntil?:Date | undefined;
     passwordChangedAt?:Date;
-    comparePassword(enteredPassword:string):Promise<boolean>;
 }

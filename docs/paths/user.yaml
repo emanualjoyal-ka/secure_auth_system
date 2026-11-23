@@ -1,0 +1,12 @@
+profile:
+  get:
+    summary: Get logged-in user profile
+    tags:
+      - Users
+    security:
+      - accessCookie: []
+    responses:
+      "200":
+        description: Profile retrieved successfully
+      "401":
+        description: Access token missing or invalid
