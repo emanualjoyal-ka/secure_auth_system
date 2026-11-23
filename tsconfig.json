@@ -30,6 +30,6 @@
     "noUnusedParameters": true,
     "skipLibCheck": true                         // Speeds up compilation
   },
-  "include": ["src/**/*"],                       // Only compile files in src
+  "include": ["src/**/*", "docs"],                       // Only compile files in src
   "exclude": ["node_modules", "dist"]            // Don't look at these folders
 }

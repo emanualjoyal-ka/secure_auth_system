@@ -1,0 +1,63 @@
+register:
+  post:
+    summary: Register a new user
+    description: Creates a new user account with name,email and password
+    tags:
+      - Authentication
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/auth.yaml#/RegisterRequest"
+    responses:
+      "201":
+        description: User created successfully
+      "400":
+        description: Invalid request data
+      "409":
+        description: User already exists
+      "500":
+        description: Internal server error
+
+login:
+  post:
+    summary: Login
+    description: Authenticates a user using email and password.
+      On successful authentication, access and refresh tokens
+      are sent as HttpOnly cookies.
+    tags:
+      - Authentication
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/auth.yaml#/LoginRequest"
+    responses:
+      "200":
+        description: Login successful. Access and refresh tokens are set as HttpOnly cookies.
+        headers: 
+          Set-Cookie:
+            description: Contains accessToken and refreshToken cookies.
+            schema: 
+              type: string
+            example: accessToken=...; HttpOnly; Secure; SameSite=Strict
+      "400":
+        description: Invalid request data
+      "404":
+        description: User don't exists
+      "500":
+        description: Internal server error
+
+logout:
+  post:
+    summary: logout
+    description: logging out revokes all sessions
+    tags :
+      - Authentication
+    responses:
+      "200":
+        description: logged out successfully
+      "401":
+        description: Access token missing or invalid

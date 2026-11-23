@@ -1,0 +1,35 @@
+openapi: 3.0.3
+
+info:
+  title: Secure Auth API
+  version: 1.0.0
+  description: API documentation for Secure Authentication System
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /api/auth/register:
+    $ref: "./paths/auth.yaml#/register"
+  /api/auth/login:
+    $ref: "./paths/auth.yaml#/login"
+  /api/auth/me:
+    $ref: "./paths/user.yaml#/profile"
+  /api/auth/logout:
+    $ref: "./paths/auth.yaml#/logout"
+
+components:
+  securitySchemes:
+    accessCookie:
+      type: apiKey
+      in: cookie
+      name: accessToken
+      description: Access token stored in an HttpOnly cookie.
+    refreshCookie:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+      description: Refresh token stored in an HttpOnly cookie.

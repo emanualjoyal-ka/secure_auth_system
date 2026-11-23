@@ -1,46 +1,39 @@
-import { NextFunction, Request, Response} from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import userModel from "../models/user.model.js";
+import type { Request, Response, NextFunction } from "express";
+import ApiError from "../utils/ApiError.js";
+import { verifyAccessToken } from "../utils/generateToken.js";
+import sessionModel from "../models/session.model.js";
 
 
-export interface AuthRequest extends Request{
-    user?:any;
-}
-
-interface CustomJwtPayload extends JwtPayload{ //jwtpayload to include iat which create when token is generated
-    id:string;
-    role:string;
-}
-
-export const authenticate=async (req:AuthRequest,res:Response,next:NextFunction)=>{
-    try {
-        //get accessToken from cookie
-        const token=req.cookies.accessToken;
-        if(!token){
-            return res.status(401).json({success:false,error:"No access token"});
-        }
-
-        const decoded=jwt.verify(token,process.env.JWT_SECRET!) as CustomJwtPayload;
-        
-        const user=await userModel.findById(decoded.id).select("-password");
-        
-        if(!user){
-            return res.status(401).json({success:false,error:"User not found"});
-        }
-
-        if(user.passwordChangedAt && decoded.iat){ //when password change, jwt becomes useless
-            const tokenIssuedAt=decoded.iat*1000;
-            if(tokenIssuedAt < user.passwordChangedAt.getTime()){
-                return res.status(401).json({message:"Token invalid due to password change"})
-            }
-        }
-
-        //attatch user to request
-        req.user=user;
-
-        next();
-
-    } catch (error) {
-        return res.status(401).json({success:false,error:"Invalid or expired token"});
+declare global {
+  namespace Express { 
+    interface Request {
+      user?: {
+        userId: string;
+        token_id: string;
+        role:string
+      };
     }
+  }
+}
+
+
+export const authenticate=async(req: Request,_res: Response,next: NextFunction)=> {
+    const token = req.cookies.accessToken
+    if(!token){
+        throw new ApiError("Access token is required",401);
+    }
+
+    const payload = verifyAccessToken(token);
+    const session = await sessionModel.findOne({token_id:payload.token_id})
+    console.log(session)
+    if (!session || session.isRevoked || session.expiresAt < new Date()) {
+        throw new ApiError("Session expired", 401);
+    }
+    
+    req.user = {
+      userId: payload.userId,
+      token_id:payload.token_id,
+      role: payload.role
+    };
+    next();
 }

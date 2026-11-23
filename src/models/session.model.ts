@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { ISession } from "../interfaces/ISession.js";
-import bcrypt from "bcrypt";
 
 const sessionSchema=new mongoose.Schema<ISession>({
     userId:{
@@ -11,12 +10,15 @@ const sessionSchema=new mongoose.Schema<ISession>({
     },
     refreshToken:{
         type:String,
-        required:true,
-        index:true
+        required:true
     },
-    isValid:{
+    token_id:{
+        type:String,
+        required:true
+    },
+    isRevoked:{
         type:Boolean,
-        default:true
+        default:false
     },
     userAgent:{
         type:String // device or browser info
@@ -33,13 +35,7 @@ const sessionSchema=new mongoose.Schema<ISession>({
     timestamps:true
 })
 
-sessionSchema.pre<ISession>("save",async function(){ //hashing requestToken incase db is leaked 
-    if(!this.isModified("refreshToken")) return;
-
-    this.refreshToken=await bcrypt.hash(this.refreshToken,10);
-})
-
 sessionSchema.index({expiresAt:1},{expireAfterSeconds:0}) //auto deletes expired sessions
-sessionSchema.index({ userId: 1, isValid: 1 }); //avoids scanning entire documents
+sessionSchema.index({ userId: 1, isRevoked: 1 }); //avoids scanning entire documents
 
 export default mongoose.model<ISession>("Session",sessionSchema);
