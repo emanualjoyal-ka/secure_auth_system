@@ -26,6 +26,13 @@ const userSchema=new mongoose.Schema<IUser>({
         enum:["user","admin"],
         default:"user"
     },
+    isEmailVerified:{
+        type:Boolean,
+        default:false
+    },
+    emailVerifiedAt:{
+        type:Date
+    },
     loginAttempts:{
         type:Number,
         default:0
@@ -35,6 +42,10 @@ const userSchema=new mongoose.Schema<IUser>({
     },
     passwordChangedAt:{
         type:Date
+    },
+    tokenVersion:{
+        type:Number,
+        default:0
     }
 },
 {

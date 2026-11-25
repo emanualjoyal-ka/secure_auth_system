@@ -1,9 +1,11 @@
 export interface sessionDetails {
     id: string;
-    userAgent:string;
+    userAgent: string | null;
     createdAt: Date;
     expiresAt: Date;
+    currentSession?: boolean;
 }
+
 
 export type PaginationDTO = {
     page: number;

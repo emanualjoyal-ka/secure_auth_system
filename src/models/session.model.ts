@@ -36,6 +36,6 @@ const sessionSchema=new mongoose.Schema<ISession>({
 })
 
 sessionSchema.index({expiresAt:1},{expireAfterSeconds:0}) //auto deletes expired sessions
-sessionSchema.index({ userId: 1, isRevoked: 1 }); //avoids scanning entire documents
+sessionSchema.index({ userId: 1, token_id: 1 },{unique:true}); //avoids scanning entire documents
 
 export default mongoose.model<ISession>("Session",sessionSchema);

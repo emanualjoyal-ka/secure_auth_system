@@ -6,11 +6,13 @@ export interface AccessTokenPayload {
   userId: string;
   role: string;
   token_id:string;
+  tokenVersion:number;
 }
 
 export interface RefreshTokenPayload {
   userId: string;
   token_id:string;
+  tokenVersion: number;
 }
 
 

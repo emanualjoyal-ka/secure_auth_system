@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import { changeUserPassword, createUser, currentUser, getAllSessions, handlerefreshtoken, loginUser, logoutAllDevices, logoutSession, logoutUser } from "../services/auth.service.js";
 import { sendResponse } from "../utils/ApiResponse.js";
-import { accessCookieOptions, refreshCookieOptions } from "../utils/cookie.js";
+import { accessCookieOptions, clearAuthCookies, refreshCookieOptions } from "../utils/cookie.js";
 
 
 export const registerUser=async(req:Request,res:Response)=>{
@@ -55,8 +55,7 @@ export const refreshTokenController=async(req:Request,res:Response)=>{
 export const logout=async(req:Request,res:Response)=>{
     const token=req.cookies?.refreshToken;
     if(token) await logoutUser(token);
-    res.clearCookie("accessToken",{path:"/"});
-    res.clearCookie("refreshToken",{path:"/"});
+    clearAuthCookies(res)
     return sendResponse(res,{
         statusCode:200,
         message:"Logged out successfully"
@@ -67,8 +66,7 @@ export const logout=async(req:Request,res:Response)=>{
 export const allDeviceLogout=async(req:Request,res:Response)=>{
         const token=req.cookies?.refreshToken;
         if(token) await logoutAllDevices(token);
-        res.clearCookie("accessToken",{path:"/"});
-        res.clearCookie("refreshToken",{path:"/"});
+        clearAuthCookies(res);
         return sendResponse(res,{
             statusCode:200,
             message:"Successfully logged out from all devices"
@@ -104,9 +102,7 @@ export const changePassword=async (req:Request,res:Response)=>{
         const userId=req.user?.userId;
         const {currentPassword,newPassword}=req.body;
         await changeUserPassword(userId,currentPassword,newPassword);
-        //clear cookies, force login
-        res.clearCookie("accessToken",{path:"/"});
-        res.clearCookie("refreshToken",{path:"/"});
+        clearAuthCookies(res);
         return sendResponse(res,{
             statusCode:200,
             message:"Password Changed,please login again"

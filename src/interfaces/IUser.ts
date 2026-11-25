@@ -9,4 +9,7 @@ export interface IUser extends Document{
     loginAttempts:number;
     lockUntil?:Date | undefined;
     passwordChangedAt?:Date;
+    isEmailVerified:boolean;
+    emailVerifiedAt?:Date;
+    tokenVersion:number;
 }

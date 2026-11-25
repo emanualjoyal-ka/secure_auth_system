@@ -1,25 +1,22 @@
 import express from "express";
 import { allDeviceLogout, changePassword, getSessions, getUser, logout, logoutDevice, refreshTokenController, registerUser, userLogin } from "../controllers/auth.controller.js";
-import { createLimiter } from "../middleware/rateLimit.middleware.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import validate from "../middleware/validate.middleware.js";
 import { loginValidation, registerValidation } from "../validations/auth.validation.js";
+import { changePasswordValidation } from "../validations/changePassword.validation.js";
+import { changePasswordLimiter, loginLimiter, logoutAllDevicesLimiter, logoutDeviceLimiter, logoutLimiter, refreshLimiter, registerLimiter } from "../config/rateLimiters.js";
 
 const router=express.Router();
-const registerLimiter=createLimiter(15*60*1000,10,"Too many register attempts"); //10 attempts within 15 minutes 
-const loginLimiter=createLimiter(15*60*1000,10,"Too many login attempts, try again later");//10 atttempts
-const refreshLimiter=createLimiter(15*60*1000,20,"Too many refresh attempts, try later");//20 attempts
-const logoutLimiter=createLimiter(15*60*1000,50,"Too many logout attempts, try again later");//50 attempts
-const changePasswordLimiter=createLimiter(15*60*1000,5,"Too many attempts"); //5 attempts
+
 
 router.post("/register",registerLimiter,validate(registerValidation),registerUser);
 router.post("/login",loginLimiter,validate(loginValidation),userLogin);
 router.get("/me",authenticate,getUser)
 router.post("/logout",logoutLimiter,logout);
 router.post("/refresh",refreshLimiter,refreshTokenController);
-router.post("/logout-all-devices",logoutLimiter,allDeviceLogout);
-router.post("/logout-device/:sessionId",logoutLimiter,authenticate,logoutDevice);
-router.post("/change-password",authenticate,changePasswordLimiter,changePassword);
+router.post("/logout-all-devices",logoutAllDevicesLimiter,authenticate,allDeviceLogout);
+router.post("/logout-device/:sessionId",logoutDeviceLimiter,authenticate,logoutDevice);
+router.post("/change-password",changePasswordLimiter,authenticate,validate(changePasswordValidation),changePassword);
 router.get("/get-sessions",authenticate,getSessions)
 
 

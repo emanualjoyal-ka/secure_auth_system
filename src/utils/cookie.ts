@@ -1,5 +1,6 @@
 import type { CookieOptions } from "express";
 import { env } from "../config/env.js";
+import { Response } from "express";
 
 export const refreshCookieOptions:CookieOptions= {
   httpOnly: true,
@@ -17,13 +18,8 @@ export const accessCookieOptions: CookieOptions = {
     path: "/"
 };
 
-export const getCookieValue=(cookieHeader: string,cookieName: string): string | undefined=> {
-  const cookies = cookieHeader.split(";");
-  for (const cookie of cookies) {
-    const [name, ...valueParts] = cookie.trim().split("=");
-    if (name === cookieName) {
-      return decodeURIComponent(valueParts.join("="));
-    }
-  }
-  return undefined;
-}
+
+export const clearAuthCookies = (res: Response) => {
+    res.clearCookie("accessToken",accessCookieOptions);
+    res.clearCookie("refreshToken",refreshCookieOptions);
+};

@@ -8,5 +8,6 @@ export interface userRegisterResponse{
     id:string;
     name:string;
     email:string;
-    role:string
+    role:string;
+    verificationToken?:string;
 }
