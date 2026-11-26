@@ -6,10 +6,10 @@ info:
   description: API documentation for Secure Authentication System
 
 servers:
+  - url: https://secure-auth-system-ghwd.onrender.com
+    description: Production server
   - url: http://localhost:5000
     description: Development server
-  - url: https://api.example.com
-    description: Production server
 
 paths:
   /api/auth/register:
@@ -30,6 +30,14 @@ paths:
     $ref: "./paths/auth.yaml#/logout-from-device"
   /api/auth/logout-all-devices:
     $ref: "./paths/auth.yaml#/logout-all-devices"
+  /api/account/verify-email:
+    $ref: "./paths/account.yaml#/verification"
+  /api/account/resend-verification:
+    $ref: "./paths/account.yaml#/resend-verification"
+  /api/account/forgot-password:
+    $ref: "./paths/account.yaml#/forgot-password"
+  /api/account/reset-password:
+    $ref: "./paths/account.yaml#/reset-password"
 
 components:
   securitySchemes:

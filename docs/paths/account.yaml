@@ -1,0 +1,260 @@
+verification:
+  post: 
+    summary: Verify email
+    description: >
+      Verify email using the link sent to the mail used to register or 
+      copy the token from register response.
+      The token expires after 30 minutes.
+      In that case, request for another verification token using /api/account/resend-verification. 
+    tags:
+      - Account
+    parameters:
+      - in: query
+        name: token
+        required: true
+        schema:
+          type: string
+        description: verificationToken from api/auth/register
+    responses:
+      200:
+        description: Email verified successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 200
+                message:
+                  type: string
+                  example: Email verified successfully
+      400:
+        description: Invalid, expired, or already used verification token, or account already verified/unavailable
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 400
+                message:
+                  type: string
+                  example: Invalid or expired verification link
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 500
+                message:
+                  type: string
+                  example: Internal server error
+
+resend-verification:
+  post:
+    summary: Resend verification token
+    description: >  
+      Resend the email verification token to the registered email address.
+      Any previously unused verification tokens will be invalidated.
+      The new token expires after 30 minutes.
+      For security reasons, the same generic response is returned
+      regardless of whether the account exists or is already verified.
+    tags:
+      - Account
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/account.yaml#/Resend-verification-request"
+    responses:
+      200:
+        description: Verification request processed successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 200
+                data:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: If an account requires verification, a verification email will be sent.
+                    verificationToken:
+                      type: string
+                      description: Verification token (returned only in demo mode when explicitly enabled)
+                      example: a1b2c3d4e5f6
+                      nullable: true
+      400:
+        description: Invalid email address
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 400
+                message:
+                  type: string
+                  example: Invalid email address
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 500
+                message:
+                  type: string
+                  example: Internal server error
+
+forgot-password:
+  post:
+    summary: Request for password reset
+    description: >
+        Request a password reset link by providing the registered email address.
+        A password reset token will be generated and sent to the registered email and for demo purpose verification token is send with response too..
+        Any previously unused password reset tokens will be invalidated.
+        The token expires after 15 minutes.
+        For security reasons, the same generic response is returned
+        regardless of whether the email address is registered.
+    tags:
+      - Account
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/account.yaml#/Forgot-password-request"
+    responses:
+      200:
+        description: Password reset request processed successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 200
+                data:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: If an account exists with this email, password reset instructions will be sent.
+                    verificationToken:
+                      type: string
+                      nullable: true
+                      description: Password reset token (returned only in demo mode when explicitly enabled)
+                      example: a1b2c3d4e5f6
+      400:
+        description: Invalid email address
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 400
+                message:
+                  type: string
+                  example: Invalid email address
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 500
+                message:
+                  type: string
+                  example: Internal server error
+
+reset-password:
+  post:
+    summary: Create new password
+    description: >
+        Reset the account password using the password reset token received through email.
+        The reset token expires after 15 minutes and can only be used once.
+        Upon successful password reset, all existing sessions across devices
+        will be revoked, requiring the user to log in again.
+    tags:
+      - Account
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/account.yaml#/Reset-password-request"
+    responses:
+      200:
+        description: Password reset successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 200
+                message:
+                  type: string
+                  example: Password reset successfully. Please log in
+      400:
+        description: Invalid or expired password reset token
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 400
+                message:
+                  type: string
+                  example: Invalid or expired reset link
+      404:
+        description: Account associated with the reset token not found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 404
+                message:
+                  type: string
+                  example: Account not found
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusCode:
+                  type: integer
+                  example: 500
+                message:
+                  type: string
+                  example: Internal server error

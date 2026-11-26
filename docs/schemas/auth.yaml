@@ -41,7 +41,7 @@ ChangePassword:
   properties:
     currentPassword:
       type: string
-      forma: password
+      format: password
       example: StrongPassword123!
     newPassword:
       type: string

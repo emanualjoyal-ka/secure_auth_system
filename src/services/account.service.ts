@@ -7,7 +7,6 @@ import bcrypt from "bcrypt";
 import sessionModel from "../models/session.model.js";
 import { env } from "../config/env.js";
 import { forgotPasswordResponse, resendVerificationResponse } from "../dtos/auth.dto/verificationResponse.js";
-import { sendPasswordResetEmail, sendVerificationEmail } from "../config/email.js";
 
 
 export const verifyEmail = async (token: string): Promise<void> => {
@@ -66,7 +65,7 @@ export const resendVerification = async (email: string,): Promise<resendVerifica
       ],{session}
     );
   });
-  await sendVerificationEmail(normalizedEmail, rawToken);
+//   await sendVerificationEmail(normalizedEmail, rawToken);
   }finally{
     await session.endSession();
   }
@@ -103,7 +102,7 @@ export const forgotPassword = async (email: string): Promise<forgotPasswordRespo
                 {session}
             );
         });
-        await sendPasswordResetEmail(normalizedEmail,rawToken);
+        // await sendPasswordResetEmail(normalizedEmail,rawToken);
     } finally {
         await session.endSession();
     }

@@ -13,7 +13,6 @@ import { AllSessionsDtoResponse } from "../dtos/auth.dto/sessionResponseDto.js";
 import { generateAccountToken } from "../utils/accountToken.js";
 import accountTokenModel from "../models/accountToken.model.js";  
 import { env } from "../config/env.js";
-import { sendVerificationEmail } from "../config/email.js";
 
 export const createUser = async (user: userRegisterRequest): Promise<userRegisterResponse> => {
   const email = user.email.trim().toLowerCase();
@@ -33,7 +32,7 @@ export const createUser = async (user: userRegisterRequest): Promise<userRegiste
     purpose: "email_verification",
     expiresAt: new Date(Date.now() + 30 * 60 * 1000)
   });
-  await sendVerificationEmail(user.email, rawToken);
+//   await sendVerificationEmail(user.email, rawToken);
   const response: userRegisterResponse = {
     id: res._id.toString(),
     name: res.name,
@@ -164,7 +163,7 @@ export const logoutUser = async (refreshToken: string): Promise<void> => {
             isRevoked: false,
             refreshToken: session.refreshToken
         },
-        {$set: {isRevoked: true}},{new: true}
+        {$set: {isRevoked: true}},{returnDocument: "after"}
     );
     if (!revokedSession) throw new ApiError("Session already expired", 401);
 };

@@ -2,6 +2,7 @@ import {describe,it,expect, beforeEach, afterEach} from "vitest"
 import userModel from "../../../src/models/user.model"
 import mongoose from "mongoose"
 import { registerRequest, userData } from "../../helpers/auth.helper"
+import bcrypt from "bcrypt"
 
 describe("POST /api/auth/register",()=>{
     
@@ -24,24 +25,24 @@ describe("POST /api/auth/register",()=>{
 
     it("Should reject registration when name is missing",async()=>{
         const res=await registerRequest({
-            email:"test@gmail.com",
-            password:"Password123!"
+            email:userData.email,
+            password:userData.password
         })
         expect(res.status).toBe(400)
     })
 
     it("Should reject registration when email is missing",async()=>{
         const res=await registerRequest({
-            name:"test",
-            password:"Password123!"
+            name:userData.name,
+            password:userData.password
         })
         expect(res.status).toBe(400)
     })
 
     it("Should reject registration when password is missing",async()=>{
         const res=await registerRequest({
-            name:"test",
-            email:"test@gmail.com"
+            name:userData.name,
+            email:userData.email
         })
         expect(res.status).toBe(400)
     })
@@ -62,6 +63,16 @@ describe("POST /api/auth/register",()=>{
         expect(res.status).toBe(400)
     })
 
+    it("should hash password before storing in database",async()=>{
+        const res=await registerRequest(userData);
+        expect(res.status).toBe(201)
+        const user=await userModel.findOne({email:userData.email})
+        expect(user).not.toBeNull();
+        expect(user!.password).not.toBe(userData.password)
+        const isPasswordValid=await bcrypt.compare(userData.password,user!.password)
+        expect(isPasswordValid).toBe(true);
+    })
+
     it("Should reject duplicate email registration",async()=>{
         await registerRequest(userData)
         const res=await registerRequest(userData)
@@ -71,7 +82,7 @@ describe("POST /api/auth/register",()=>{
     it("should never return the user's password", async () => {
         const res = await registerRequest(userData);
         expect(res.body.data?.password).toBeUndefined();
-        expect(JSON.stringify(res.body)).not.toContain("Password123!");
+        expect(JSON.stringify(res.body)).not.toContain(userData.password);
     });
 
     it("should reject registration when role is provided", async () => {

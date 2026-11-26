@@ -1,0 +1,38 @@
+Resend-verification-request:
+  type: object
+  required:
+    - email
+  properties:
+    email:
+      type: string
+      format: email
+      example: john@example.com
+
+Forgot-password-request:
+  type: object
+  required:
+    - email
+  properties:
+    email:
+      type: string
+      format: email
+      example: john@example.com
+
+Reset-password-request:
+  type: object
+  required:
+    - token
+    - newPassword
+    - confirmPassword
+  properties:
+    token:
+      type: string
+      example: ex23jcjdc...
+    newPassword:
+      type: string
+      format: password
+      example: NewStrongPassword123!
+    confirmPassword:
+      type: string
+      format: password
+      example: NewStrongPassword123!

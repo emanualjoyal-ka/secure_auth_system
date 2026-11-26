@@ -9,6 +9,7 @@ export default defineConfig({
     },
     globals: false,
     clearMocks: true,
-    restoreMocks: true
+    restoreMocks: true,
+    fileParallelism: false // Prevent test files from running simultaneously
   }
 });
